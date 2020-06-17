@@ -36,7 +36,7 @@ def print_hello(t):
 
 def read_and_process_input():
     while True:
-        n = int(input())
+        n = int(input()) # 이때 gil blocking 풀림
         print('fib({}) = {}'.format(n, timed_fib(n)))
 
 
