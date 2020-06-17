@@ -10,12 +10,27 @@ from fib import timed_fib
 
 
 def process_input(stream):
+    # stream is <_io.TextIOWrapper name='<stdin>' mode='r' encoding='UTF-8'>
     text = stream.readline()
     n = int(text.strip())
-    print('[fileboj: {}]--> fib({}) = {}'.format(stream, n, timed_fib(n)))
+    print('[fileboj: {}]--> fib({}) = {}'.format(id(stream), n, timed_fib(n))) # [fileboj: 140591049069912]--> fib(5) = 5
 
 
-def print_hello(): print("{} - Hello world!".format(int(time())))
+def print_hello():
+    print("{} - Hello world!".format(int(time())))
 
 
-def main(): selector = selectors.DefaultSelector()  # Register the selector to poll for "read" readiness on stdin selector.register(sys.stdin, selectors.EVENT_READ) last_hello = 0 # Setting to 0 means the timer will start right away while True: # Wait at most 100 milliseconds for input to be available for event, mask in selector.select(0.1): process_input(event.fileobj) if time() - last_hello > 3: last_hello = time() print_hello() if __name__ == '__main__': main()
+def main():
+    selector = selectors.DefaultSelector() # Default is SelectSelector
+    selector.register(sys.stdin, selectors.EVENT_READ)
+    last_hello = 0  # Setting to 0 means the timer will start right away
+    while True:
+        for event, mask in selector.select(.1): # .1초 동안 block 시키고 register 시킨 event가 발생했는지 확인
+            process_input(event.fileobj)
+        if time() - last_hello > 3:
+            last_hello = time()
+            print_hello()
+
+
+if __name__ == '__main__':
+    main()
