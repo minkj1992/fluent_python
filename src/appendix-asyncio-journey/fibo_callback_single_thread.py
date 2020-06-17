@@ -2,7 +2,7 @@ import sys
 import selectors
 from time import time
 from bisect import insort
-from collections import namedtuple, deque
+from collections import namedtuple
 from fib import timed_fib
 
 Timer = namedtuple('Timer', ('timestamp', 'handler'))
@@ -18,8 +18,8 @@ class EventLoop:
     def __init__(self, *tasks):
         self._running = False
         self._stdin_handlers = list()  # This is for callback functions without timer
-        self._timers = deque([]) # (callback, time)
-        self._selector = selectors.DefaultSelector()
+        self._timers = [] # (callback, time)
+        self._selector = selectors.DefaultSelector() # SelectSelector
         self._selector.register(sys.stdin, selectors.EVENT_READ)
 
     def run_forever(self, time_out=0):
@@ -34,7 +34,8 @@ class EventLoop:
 
             # Handle timer events: consumer
             while self._timers and self._timers[0].timestamp < time():
-                handler = self._timers.popleft().handler
+                handler = self._timers[0].handler
+                del self._timers[0]
                 handler()
 
     def add_stdin_handler(self, callback):
