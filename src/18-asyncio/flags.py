@@ -1,9 +1,12 @@
 """Download flags of top 20 countries by population
-REST API with <https://www.countryflags.io/:country_code/:style/:size.png> to get flags of 20 countries png files and download to sub-directory in os.getcwd()
+REST API with <https://www.countryflags.io/:country_code/:style/:size.png>
+to get flags of 20 countries png files and download to sub-directory in os.getcwd()
+
+Author: minwook.je
 Sample run::
     $ python3 flags.py
-    BD BR CD CN DE EG ET FR ID IN IR JP MX NG PH PK RU TR US VN
-    20 flags downloaded in 20.00 sec
+    BD BR CD DE EG ET FR ID IN IR JP KR MX NG PH PK RU TR US VN
+    20 flags downloaded in 12.3875317574 sec
 """
 
 import os
@@ -12,7 +15,7 @@ import time
 import requests
 
 POP20_CC = ('KR IN US ID BR PK NG BD RU JP '
-            'MX PH VN ET EG DE IR TR CD FR').split()  # <2>
+            'MX PH VN ET EG DE IR TR CD FR').split()
 
 BASE_URL = "https://www.countryflags.io"
 
@@ -36,10 +39,10 @@ def show(serialized):
     print(serialized, end=' ', flush=True)  # print문에 flush()강제 가능하다.
 
 
-def save_flag(img, filename):
+def save_flag(img, filename, type='png'):
     """ Download img to DEST_DIR"""
-
-    path = os.path.join(DEST_DIR, filename + '.png')  # TODO: /이 없어야 join이 제대로 동작한다.
+    file = filename + '.' + type
+    path = os.path.join(DEST_DIR, file)  # TODO: /이 없어야 join이 제대로 동작한다.
     with open(path, 'wb') as fp:
         fp.write(img)
 
@@ -54,20 +57,22 @@ def download_many(country_list):
     return len(country_list)  # TODO: 중간에 다운로드 실패할 경우
 
 
-def main(download_many):
+def main_method(func):
     """ Log process time and delegate the process to download method()"""
+
     start_time = time.time()
-    count = download_many(POP20_CC)
+    count = func(POP20_CC)
+    msg = '\n{:d} flags downloaded in {:.10f} sec'
     elapsed = time.time() - start_time
-    msg = '\n flags downloaded in {:.2f} sec'
     print(msg.format(count, elapsed))
 
 
 def make_dir():
     """존재하더라도 error 내지않으며, 존재하지 않는다면 디렉토리들을 생성해준다."""
+
     os.makedirs(DEST_DIR, exist_ok=True)
 
 
 if __name__ == '__main__':
     make_dir()
-    main(download_many)
+    main_method(download_many)
