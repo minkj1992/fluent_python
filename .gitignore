@@ -15,3 +15,6 @@ venv.bak/
 *.pyc
 __pycache__/
 
+# licensed image
+downloads/
+img/
