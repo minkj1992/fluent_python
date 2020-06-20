@@ -51,14 +51,14 @@ async def download_one(loop, country):
 
 
 def download_many(country_list):
-    loop = asyncio.new_event_loop()
+    loop = asyncio.get_event_loop()  # new_event_loop은 새로 event loop을 만드는 것
     # 코루틴을 모두 다 생성한다. 함수를 호출하지는 않는다.
     to_do = [download_one(loop, country) for country in
              sorted(country_list)]  # wait() expect a list of futures, not generator
     wait_coro = asyncio.wait(to_do)  # wait for multiple coro, non-blocking, 바로 generator return
-    res, _ = loop.run_until_complete(wait_coro)  # wait_coro가 스케쥴러에 의해서 완료되기 전까지는 block된다. (heapify를 진행하기 때문에 주어진 리스트 그대로 사용되지는 않고 정렬된다.)
+    res, _ = loop.run_until_complete(
+        wait_coro)  # wait_coro가 스케쥴러에 의해서 완료되기 전까지는 block된다. (heapify를 진행하기 때문에 주어진 리스트 그대로 사용되지는 않고 정렬된다.)
     loop.close()
-    print()
     return len(res)
 
 
