@@ -2,6 +2,7 @@
 총 2가지 쓰레드에서 (Main Thread 와 work Thread) work Thread를 비동기 통신을 진행을 테스트하여
 worker Thread의 non blocking 여부를 확인한다.
 
+Multithread_with_asyncio.py to test whether non blocking async def is interrupted or not
 Author: minwook.je
 Sample run::
     $ python3 multithread_with_asyncio.py
@@ -17,7 +18,7 @@ import threading
 import asyncio
 import aiohttp
 import time
-from flags import BASE_URL, save_flag, show, main_method
+from flags import BASE_URL, save_flag, show, main_method, make_dir
 
 
 async def get_flag(session, country):
@@ -42,7 +43,7 @@ async def download_one(loop, country):
 
 
 def download_many(country_list):
-    loop = asyncio.new_event_loop()
+    loop = asyncio.get_event_loop() # Main Thread만 event loop를 default로 가지고 있다.
     to_do = [download_one(loop, country) for country in
              sorted(country_list)]
     wait_coro = asyncio.wait(to_do)
@@ -60,7 +61,9 @@ def interrupt_printer():
 
 if __name__ == '__main__':
     # worker_thread = threading.Thread(target=main_method, args=(download_many,))
+
     worker_thread = threading.Thread(target=interrupt_printer)
     worker_thread.start()
+    make_dir()
     main_method(download_many)
     worker_thread.join()
